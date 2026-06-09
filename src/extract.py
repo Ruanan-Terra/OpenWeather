@@ -94,8 +94,8 @@ if __name__ == "__main__":
     API_KEY = os.getenv("OPENWEATHER_API_KEY")
     AZURE_CONNECTION = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
-    self = WeatherExtractor(API_KEY, AZURE_CONNECTION)
-    self.conect_azure_lake()
-    self.get_lon_lat_of_cit()
-    self.send_data_to_Lake()
+    project = WeatherExtractor(API_KEY, AZURE_CONNECTION)
+    project.conect_azure_lake()
+    project.get_lon_lat_of_cit()
+    project.send_data_to_Lake()
 

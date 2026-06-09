@@ -33,11 +33,9 @@ try:
     # ==========================================
     # 3. EXTRAÇÃO: LENDO DA CAMADA BRONZE
     # ==========================================
-    # Corrigido: O container chama-se 'datalake' e os arquivos estão na pasta 'bronze/'
     path_bronze = f"abfss://datalake@{storage_account_name}.dfs.core.windows.net/bronze/weather_*.json"
     print(f"📖 Lendo arquivos brutos de: {path_bronze}")
 
-    # Corrigido: Adicionado multiLine=true pois o JSON salvo possui quebras de linha/indentação
     df_bronze = spark.read \
         .option("multiLine", "true") \
         .json(path_bronze)
@@ -45,8 +43,6 @@ try:
     # ==========================================
     # 4. TRANSFORMAÇÃO: DATA WRANGLING & FLATTENING
     # ==========================================
-    # Usamos funções nativas do PySpark para processamento em C/Rust interno,
-    # poupando a CPU do seu Mac M5 de trabalhar com loops Python pesados.
     df_silver = df_bronze \
         .withColumn("weather_exploded", explode(col("weather"))) \
         .select(
@@ -72,21 +68,19 @@ try:
     # ==========================================
     # 5. CARGA: SALVANDO NA CAMADA SILVER
     # ==========================================
-    # Corrigido: Gravando na pasta 'silver' dentro do mesmo container 'datalake'
     path_silver = f"abfss://datalake@{storage_account_name}.dfs.core.windows.net/silver/cleaned_weather"
-    print(f"💾 Gravando os dados em formato Parquet na pasta: {path_silver}")
+    print(f"Gravando os dados em formato Parquet na pasta: {path_silver}")
     
-    # Salvando em Parquet: formato colunar de alta compressão (ótimo para Analytics)
     df_silver.write \
         .mode("overwrite") \
         .parquet(path_silver)
 
-    print("🎉 Pipeline da Camada Silver concluído com SUCESSO ABSOLUTO!")
+    print("Pipeline da Camada Silver concluído com SUCESSO ABSOLUTO!")
 
 except Exception as e:
-    print(f"❌ Ocorreu um erro durante o processamento: {e}")
+    print(f"Ocorreu um erro durante o processamento: {e}")
 
 finally:
     # Boas práticas: Sempre encerre a sessão para liberar a memória unificada do seu Mac
     spark.stop()
-    print("🛑 SparkSession encerrada com segurança.")
+    print("SparkSession encerrada com segurança.")

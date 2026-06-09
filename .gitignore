@@ -208,3 +208,17 @@ __marimo__/
 
 .env
 data/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Airflow logs and dynamic state
+airflow-docker/logs/
+**/logs/
+**/__pycache__/
