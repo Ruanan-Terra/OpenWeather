@@ -2,7 +2,6 @@ import requests
 import os
 import json
 from dotenv import load_dotenv
-import pandas as pd
 from azure.storage.blob import BlobServiceClient
 
 
@@ -62,28 +61,6 @@ class WeatherExtractor:
                     print(f"Save to Azure Data Lake: {caminho_no_azure}")
                 except Exception as e:
                     print(f"Error saving to Azure: {e}")
-
-                # Simulated Silver layer in Pandas
-                self.final_datas.append(pd.DataFrame({"ID": [data["id"]],
-                                                "city": [city["City"]],
-                                                "lat": [data["coord"]["lat"]],
-                                                "lon": [data["coord"]["lon"]],
-                                                "weather_main": [data["weather"][0]["main"]],
-                                                "weather_description": [data["weather"][0]["description"]],
-                                                "weather_icon": [data["weather"][0]["icon"]],
-                                                "temperature perception": [data["main"]["feels_like"]],
-                                                "minimum temperature": [data["main"]["temp_min"]],
-                                                "maximum temperature": [data["main"]["temp_max"]],
-                                                "humidity": [data["main"]["humidity"]],
-                                                "sea_level": [data.get("main", {}).get("sea_level", "N/A")], # Using .get() to avoid an error if sea_level is not present
-                                                "visibility": [data["visibility"]],
-                                                "wind_speed": [data["wind"]["speed"]],
-                                                "wind_deg": [data["wind"]["deg"]],
-                                                "clouds": [data["clouds"]["all"]],
-                                                "dataTime": [data["dt"]],
-                                                "country": [data["sys"]["country"]],
-                                                "sunrise": [data["sys"]["sunrise"]],
-                                                "sunset": [data["sys"]["sunset"]]}))
             else:
                 print(f"Erro: {response.status_code}")
                 print(response.text)
