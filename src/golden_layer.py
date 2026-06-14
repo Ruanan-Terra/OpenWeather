@@ -6,15 +6,15 @@ from pyspark.sql.functions import col
 def process_gold_layer():
     print("A iniciar a construção da Camada Gold...")
 
-    # 1. Carregar variáveis de ambiente de forma segura
+    # 1. Carregar variáveis de ambiente
     load_dotenv()
     azure_storage_key = os.getenv("AZURE_STORAGE_KEY1")
     
-    # Credenciais do Azure
+    # Cred. Azure
     storage_account_name = "datalakeruanan26"
     container_name = "datalake"
 
-    # 2. Inicializar o Spark (Otimizado para Apple Silicon M5)
+    # Inicializar o Spark
     spark = SparkSession.builder \
         .appName("OpenWeather_GoldLayer") \
         .config("spark.driver.memory", "4g") \
@@ -23,18 +23,18 @@ def process_gold_layer():
         .config(f"fs.azure.account.key.{storage_account_name}.dfs.core.windows.net", azure_storage_key) \
         .getOrCreate()
 
-    # Caminhos do Data Lake
+    # Data Lake
     silver_path = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/silver/cleaned_weather"
     gold_dim_path = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/gold/dim_cidades"
     gold_fact_path = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/gold/fact_meteorologia"
 
     try:
-        # 3. Ler a Tabela Silver (O Tabelão achatado)
+        #Ler Silver
         print("A ler dados da Camada Silver...")
         df_silver = spark.read.parquet(silver_path)
 
-        # 4. Construir a Tabela Dimensão (dim_cidades)
-        # Usamos distinct() para garantir que cada cidade apareça apenas uma vez, independentemente de quantas medições existam.
+        # Construir a Tab Dimensão (dim_cidades)
+        # distinct() para garantir que cada cidade apareça apenas uma vez.
         print("A modelar a Tabela Dimensão (dim_cidades)...")
         dim_cidades = df_silver.select(
             col("city_id"),
@@ -44,7 +44,7 @@ def process_gold_layer():
         ).distinct()
 
         # 5. Construir a Tabela Fato (fact_meteorologia)
-        # Selecionamos apenas as métricas de tempo e clima, usando o city_id como "chave estrangeira".
+        # Seleciona apenas as métricas de tempo e clima, usando o city_id como "chave estrangeira".
         print("A modelar a Tabela Fato (fact_meteorologia)...")
         fact_meteorologia = df_silver.select(
             col("city_id"),
