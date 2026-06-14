@@ -1,0 +1,23 @@
+# Dockerfile.spark
+FROM python:3.11-slim
+
+# Instala o Java (usando default-jre-headless para compatibilidade universal no Debian)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    default-jre-headless \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Aponta o JAVA_HOME para o link padrão do Debian, que resolve para a versão instalada automaticamente
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+ENV PATH=$PATH:$JAVA_HOME/bin
+
+WORKDIR /app
+
+# Instala o PySpark e a biblioteca dotenv
+RUN pip install --no-cache-dir pyspark==3.5.0 python-dotenv
+
+# Copia o script de transformação da sua máquina para dentro da imagem do container
+COPY src/silver_layer.py /app/silver_layer.py
+
+# Quando o Airflow mandar esse container rodar, execute o Spark
+CMD ["python", "/app/silver_layer.py"]
